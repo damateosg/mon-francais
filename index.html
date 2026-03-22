@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mon Français ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sab: env(safe-area-inset-bottom);
+            --bg: #FFF5F9;
+            --surface: #FFFFFF;
+            --primary: #E8357A;
+            --primary-light: #FFE0ED;
+            --accent: #5B4FE8;
+            --accent-light: #EAE8FF;
+            --french: #1A56C4;
+            --french-light: #DDEAFF;
+            --warn: #F59300;
+            --warn-light: #FFF3DC;
+            --text: #1A1025;
+            --muted: #9B8CA8;
+            --border: #F0E6F0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Subtle dot pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, #E8357A18 1px, transparent 1px);
+            background-size: 24px 24px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* HEADER */
+        header {
+            background: var(--surface);
+            border-bottom: 2px solid var(--border);
+            padding: 14px 20px;
+            padding-top: calc(14px + env(safe-area-inset-top));
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            display: flex;
+            flex-direction: column;
+        }
+        .logo h1 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+        .logo span {
+            font-size: 0.65rem;
+            color: var(--muted);
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .mode-toggle {
+            display: flex;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 3px;
+            gap: 3px;
+        }
+        .mode-btn {
+            border: none;
+            background: transparent;
+            width: 36px;
+            height: 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px #E8357A44;
+        }
+
+        /* MAIN */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 16px;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom));
+            position: relative;
+            z-index: 1;
+            max-width: 520px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* CARD VIEW */
+        #view-card { display: flex; flex-direction: column; height: 100%; }
+
+        /* Progress */
+        .progress-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .progress-label { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+        .progress-mode { font-size: 0.65rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.06em; }
+        .progress-track {
+            height: 5px;
+            background: var(--border);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #FF85B3);
+            border-radius: 99px;
+            transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        /* The Card */
+        .card {
+            background: var(--surface);
+            border-radius: 28px;
+            border: 2px solid var(--border);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 14px;
+            min-height: 0;
+            box-shadow: 0 8px 32px #E8357A0D, 0 2px 8px #00000008;
+        }
+        .card-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px 0;
+            flex-shrink: 0;
+        }
+        .category-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .cat-warn { background: var(--warn-light); color: var(--warn); }
+        .cat-info { background: var(--french-light); color: var(--french); }
+        .cat-ok { background: #E0F5E8; color: #1A8A3E; }
+
+        .shuffle-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            color: var(--muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        .shuffle-btn.on { background: var(--accent-light); color: var(--accent); border-color: #C5C1FF; }
+
+        .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 24px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            overflow-y: auto;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .lang-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 99px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+        }
+        .badge-es { background: var(--primary-light); color: var(--primary); }
+        .badge-fr { background: var(--french-light); color: var(--french); }
+
+        #text-es {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.4rem, 5vw, 2.2rem);
+            color: var(--text);
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .answer-section {
+            width: 100%;
+            margin-top: 20px;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .answer-section.hidden-answer {
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+        }
+        .divider { width: 40px; height: 3px; background: var(--border); border-radius: 99px; margin: 0 auto 16px; }
+
+        #text-fr {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.2rem, 4.5vw, 2rem);
+            color: var(--french);
+            line-height: 1.25;
+            margin-bottom: 6px;
+        }
+        .phonetic {
+            font-size: 0.8rem;
+            color: var(--muted);
+            font-style: italic;
+            margin-bottom: 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+        }
+
+        /* Danger zone pill */
+        .danger-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--warn-light);
+            color: var(--warn);
+            border: 1px solid #FFD99A;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            margin-bottom: 14px;
+            text-align: left;
+            max-width: 100%;
+        }
+
+        .speak-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: var(--french-light);
+            color: var(--french);
+            border: 2px solid #C5D8FF;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            letter-spacing: 0.02em;
+        }
+        .speak-btn:active { transform: scale(0.95); }
+
+        .tap-hint {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            animation: pulse 2s infinite;
+            white-space: nowrap;
+        }
+        @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .ctrl-btn {
+            border: 2px solid var(--border);
+            background: var(--surface);
+            border-radius: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.15s;
+            color: var(--text);
+        }
+        .ctrl-btn:active { transform: scale(0.92); }
+        .ctrl-btn:disabled { opacity: 0.3; pointer-events: none; }
+        #btn-prev { width: 54px; height: 54px; }
+        #btn-reset { width: 54px; height: 54px; color: var(--muted); }
+        #btn-next {
+            flex: 1;
+            height: 54px;
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 16px #E8357A44;
+        }
+        #btn-next:active { transform: scale(0.96); }
+
+        /* LIST VIEW */
+        #view-list {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: var(--surface);
+            border-radius: 24px;
+            border: 2px solid var(--border);
+            overflow: hidden;
+        }
+        #view-list.visible { display: flex; }
+        .search-bar {
+            padding: 12px 14px;
+            border-bottom: 2px solid var(--border);
+            background: var(--bg);
+            flex-shrink: 0;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 9px 14px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text);
+            outline: none;
+        }
+        .search-bar input:focus { border-color: var(--primary); }
+        .list-scroll {
+            overflow-y: auto;
+            flex: 1;
+        }
+        .list-scroll::-webkit-scrollbar { width: 4px; }
+        .list-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+        .list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--bg);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .list-item:active { background: var(--primary-light); }
+        .list-num { font-size: 0.65rem; font-weight: 700; color: var(--muted); width: 22px; text-align: right; flex-shrink: 0; margin-top: 3px; }
+        .list-es { font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+        .list-fr { font-size: 0.78rem; color: var(--french); font-weight: 500; }
+        .list-phonetic { font-size: 0.65rem; color: var(--muted); font-style: italic; }
+
+        /* Danger icon */
+        .list-danger {
+            font-size: 0.6rem;
+            background: var(--warn-light);
+            color: var(--warn);
+            border-radius: 6px;
+            padding: 1px 5px;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <h1>Mon Français ✨</h1>
+        <span>Masa crítica · 120 frases esenciales</span>
+    </div>
+    <div class="mode-toggle">
+        <button class="mode-btn active" id="btn-mode-card" onclick="setMode('card')" title="Tarjetas">🃏</button>
+        <button class="mode-btn" id="btn-mode-list" onclick="setMode('list')" title="Lista">☰</button>
+    </div>
+</header>
+
+<main>
+    <!-- CARD VIEW -->
+    <div id="view-card">
+        <div class="progress-row">
+            <span class="progress-label" id="progress-text">Frase 1 de 120</span>
+            <span class="progress-mode" id="shuffle-indicator">Secuencial</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-bar" style="width:0.83%"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-top-bar">
+                <span id="cat-pill" class="category-pill cat-info">🔤 Básico</span>
+                <button class="shuffle-btn" id="btn-shuffle" onclick="toggleShuffle()" title="Aleatorio">🔀</button>
+            </div>
+
+            <div class="card-body" onclick="toggleAnswer()">
+                <span class="lang-badge badge-es">🇪🇸 Español</span>
+                <p id="text-es">Cargando...</p>
+
+                <div class="answer-section hidden-answer" id="answer-section">
+                    <div class="divider"></div>
+                    <span class="lang-badge badge-fr">🇫🇷 Français</span>
+                    <p id="text-fr">Chargement...</p>
+                    <p class="phonetic" id="text-phonetic"></p>
+                    <div id="danger-zone" style="display:none">
+                        <div class="danger-note" id="danger-text">⚠️ Nota</div>
+                    </div>
+                    <button class="speak-btn" onclick="event.stopPropagation(); speakCurrent()">
+                        🔊 Escuchar en francés
+                    </button>
+                </div>
+
+                <div class="tap-hint" id="tap-hint">Toca para ver la traducción</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="ctrl-btn" id="btn-prev" onclick="prevCard()">◀</button>
+            <button class="ctrl-btn" id="btn-reset" onclick="resetApp()" title="Reiniciar">↺</button>
+            <button class="ctrl-btn" id="btn-next" onclick="nextCard()">SIGUIENTE →</button>
+        </div>
+    </div>
+
+    <!-- LIST VIEW -->
+    <div id="view-list">
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="🔍 Buscar frase..." onkeyup="renderList()">
+        </div>
+        <div class="list-scroll">
+            <div id="list-body"></div>
+        </div>
+    </div>
+</main>
+
+<script>
+// ============================================================
+// MASA CRÍTICA EN FRANCÉS – 120 frases esenciales
+// Diseñadas para hispanohablantes de 13 años
+// Con indicador de "zona peligrosa" para evitar errores típicos
+// ============================================================
+// Categorías: basico, saludo, social, tiempo, lugar, descripcion, 
+//             modal, pasado, negacion, pronombre, articulo, formal
+// Danger: falso-amigo | pronunciacion | genero | preposicion | 
+//         pasado | pronombre | articulo | contraccion | formalidad | negacion
+
+const rawData = [
+// ── SALUDOS Y PRESENTACIONES ──────────────────────────────
+{ id:1,  es:"Hola, ¿cómo te llamas?",          fr:"Bonjour, comment tu t'appelles ?",       ph:"bõʒuʁ, komɑ̃ ty tapɛl",       cat:"saludo",      danger:null },
+{ id:2,  es:"Me llamo Sofía.",                 fr:"Je m'appelle Sofia.",                     ph:"ʒə mapɛl sofia",              cat:"saludo",      danger:null },
+{ id:3,  es:"Encantada de conocerte.",         fr:"Enchantée de te connaître.",              ph:"ɑ̃ʃɑ̃te də tə konɛtʁ",        cat:"saludo",      danger:null },
+{ id:4,  es:"¿Cómo estás?",                   fr:"Comment tu vas ?",                        ph:"komɑ̃ ty va",                  cat:"saludo",      danger:null },
+{ id:5,  es:"Muy bien, gracias. ¿Y tú?",       fr:"Très bien, merci. Et toi ?",              ph:"tʁɛ bjɛ̃, mɛʁsi. e twa",      cat:"saludo",      danger:null },
+{ id:6,  es:"¡Hasta luego!",                  fr:"À bientôt !",                             ph:"a bjɛ̃to",                    cat:"saludo",      danger:null },
+{ id:7,  es:"Buenas noches.",                 fr:"Bonne nuit.",                             ph:"bɔn nɥi",                     cat:"saludo",      danger:null },
+{ id:8,  es:"Perdona, no entiendo.",          fr:"Pardon, je ne comprends pas.",            ph:"paʁdɔ̃, ʒə nə kɔ̃pʁɑ̃ pa",   cat:"saludo",      danger:"negacion: ne...pas rodea al verbo → je NE comprends PAS" },
+
+// ── SOBRE MÍ Y MI VIDA ───────────────────────────────────
+{ id:9,  es:"Tengo trece años.",              fr:"J'ai treize ans.",                        ph:"ʒe tʁɛzɑ̃",                   cat:"basico",      danger:"liaison: treize ANS → suena 'tʁɛzɑ̃', la -s se pronuncia" },
+{ id:10, es:"Soy española.",                  fr:"Je suis espagnole.",                      ph:"ʒə sɥi ɛspaɲɔl",              cat:"basico",      danger:null },
+{ id:11, es:"Vivo en Sevilla.",               fr:"J'habite à Séville.",                     ph:"ʒabit a sevij",               cat:"basico",      danger:"preposicion: J'habite À Séville (no 'en')" },
+{ id:12, es:"Tengo una hermana.",             fr:"J'ai une sœur.",                          ph:"ʒe yn sœʁ",                   cat:"basico",      danger:"pronunciación: sœur suena 'sœʁ', como un gruñido francés 🐸" },
+{ id:13, es:"No tengo hermanos.",             fr:"Je n'ai pas de frères.",                  ph:"ʒə ne pa də fʁɛʁ",            cat:"basico",      danger:"negacion: pas DE + sustantivo (no 'pas des')" },
+{ id:14, es:"Me gusta la música.",            fr:"J'aime la musique.",                      ph:"ʒɛm la myzik",                cat:"basico",      danger:null },
+{ id:15, es:"No me gustan las matemáticas.",  fr:"Je n'aime pas les maths.",                ph:"ʒə nɛm pa le mat",            cat:"basico",      danger:"pronunciacion: maths solo suena 'mat', la -ths es muda" },
+{ id:16, es:"Mi asignatura favorita es Arte.",fr:"Ma matière préférée c'est l'Art.",        ph:"ma matjɛʁ pʁefeʁe sɛ laʁ",   cat:"basico",      danger:"genero: matière es femenino → MA matière, PREFÉrée" },
+{ id:17, es:"Tengo muchos amigos.",           fr:"J'ai beaucoup d'amis.",                   ph:"ʒe boku dami",                cat:"basico",      danger:"pronunciacion: beaucoup → 'boku', la p y la c no suenan" },
+{ id:18, es:"Mi mejor amiga se llama Lucía.", fr:"Ma meilleure amie s'appelle Lucía.",      ph:"ma mɛjœʁ ami sapɛl lucia",    cat:"basico",      danger:"genero: meilleure (forma femenina de meilleur)" },
+
+// ── EN EL INSTI ──────────────────────────────────────────
+{ id:19, es:"¿Puedo ir al baño?",            fr:"Est-ce que je peux aller aux toilettes ?",ph:"ɛs kə ʒə pø ale o twalɛt",   cat:"modal",       danger:"contraccion: à + les = AUX toilettes (obligatorio)" },
+{ id:20, es:"No he hecho los deberes.",      fr:"Je n'ai pas fait mes devoirs.",           ph:"ʒə ne pa fɛ me dəvwaʁ",       cat:"pasado",      danger:"pasado: avoir + fait (participio de faire)" },
+{ id:21, es:"¿Tienes un bolígrafo?",         fr:"Tu as un stylo ?",                        ph:"ty a œ̃ stilo",                cat:"basico",       danger:null },
+{ id:22, es:"¿A qué hora empieza la clase?", fr:"À quelle heure commence le cours ?",      ph:"a kɛl œʁ kɔmɑ̃s lə kuʁ",      cat:"basico",       danger:"preposicion: À quelle heure (no 'en')" },
+{ id:23, es:"¡No lo sé!",                   fr:"Je ne sais pas !",                        ph:"ʒə nə sɛ pa",                  cat:"negacion",    danger:"negacion: ne...pas obligatorio en francés escrito" },
+{ id:24, es:"Hay un examen mañana.",         fr:"Il y a un examen demain.",                ph:"il ja œ̃ ɛgzamɛ̃ dəmɛ̃",        cat:"basico",       danger:"pronunciacion: examen → 'ɛgzamɛ̃', la n final es nasal" },
+{ id:25, es:"Estudio mucho.",                fr:"J'étudie beaucoup.",                      ph:"ʒetydi boku",                  cat:"basico",       danger:null },
+{ id:26, es:"La profesora es muy simpática.", fr:"La prof est très sympa.",                ph:"la pʁɔf ɛ tʁɛ sɛ̃pa",          cat:"descripcion",  danger:null },
+
+// ── PEDIR COSAS / TIENDAS ────────────────────────────────
+{ id:27, es:"¿Cuánto cuesta?",               fr:"C'est combien ?",                         ph:"sɛ kɔ̃bjɛ̃",                   cat:"social",      danger:null },
+{ id:28, es:"Quiero una pizza, por favor.",  fr:"Je voudrais une pizza, s'il vous plaît.", ph:"ʒə vudʁɛ yn pidza sil vu plɛ", cat:"modal",      danger:"formalidad: s'il te plaît (informal) / s'il VOUS plaît (tiendas, adultos)" },
+{ id:29, es:"¿Tienes talla M?",              fr:"Vous avez la taille M ?",                 ph:"vuz ave la taj ɛm",            cat:"formal",      danger:"liaison: vous AVEZ → suena 'vuzave'" },
+{ id:30, es:"Me lo llevo.",                  fr:"Je le prends.",                           ph:"ʒə lə pʁɑ̃",                   cat:"pronombre",   danger:"pronombre: le (lo) va antes del verbo" },
+{ id:31, es:"Estoy buscando la biblioteca.", fr:"Je cherche la bibliothèque.",             ph:"ʒə ʃɛʁʃ la biblijotɛk",       cat:"social",      danger:"falso amigo: la LIBRAIRIE = librería (donde venden libros), no biblioteca" },
+{ id:32, es:"¿Dónde está la panadería?",     fr:"Où est la boulangerie ?",                 ph:"u ɛ la bulɑ̃ʒʁi",             cat:"lugar",       danger:null },
+{ id:33, es:"Necesito agua.",                fr:"J'ai besoin d'eau.",                      ph:"ʒe bəzwɛ̃ do",                cat:"basico",      danger:"articulo: de l'eau (artículo partitivo = 'algo de agua')" },
+{ id:34, es:"¿Puedes repetir más despacio?", fr:"Tu peux répéter plus lentement ?",        ph:"ty pø ʁepete ply lɑ̃tmɑ̃",     cat:"modal",       danger:null },
+
+// ── GUSTOS Y OPINIONES ───────────────────────────────────
+{ id:35, es:"Me encantan las series.",        fr:"J'adore les séries.",                     ph:"ʒadɔʁ le seʁi",               cat:"social",      danger:null },
+{ id:36, es:"No me gusta nada el fútbol.",   fr:"Je déteste le foot.",                     ph:"ʒə detɛst lə fut",             cat:"social",      danger:null },
+{ id:37, es:"Prefiero el pop al rock.",       fr:"Je préfère la pop au rock.",              ph:"ʒə pʁefɛʁ la pɔp o ʁɔk",      cat:"social",      danger:"contraccion: à + le = AU rock" },
+{ id:38, es:"¿Qué piensas?",                 fr:"Qu'est-ce que tu en penses ?",            ph:"kɛs kə ty ɑ̃ pɑ̃s",            cat:"social",      danger:"pronombre: 'en' es un pronombre que resume 'de eso'" },
+{ id:39, es:"Creo que es genial.",            fr:"Je trouve que c'est génial.",             ph:"ʒə tʁuv kə sɛ ʒenjal",        cat:"social",      danger:null },
+{ id:40, es:"Tienes razón.",                  fr:"Tu as raison.",                           ph:"ty a ʁɛzɔ̃",                   cat:"social",      danger:null },
+{ id:41, es:"No estoy de acuerdo.",          fr:"Je ne suis pas d'accord.",                ph:"ʒə nə sɥi pa dakɔʁ",          cat:"negacion",    danger:null },
+{ id:42, es:"¡Qué guay!",                    fr:"C'est trop cool !",                       ph:"sɛ tʁo kul",                   cat:"social",      danger:null },
+
+// ── EN CASA / RUTINA ─────────────────────────────────────
+{ id:43, es:"Me despierto a las siete.",      fr:"Je me réveille à sept heures.",           ph:"ʒə mə ʁevɛj a sɛt œʁ",        cat:"tiempo",      danger:"liaison: sept HEURES → la t suena: 'sɛtœʁ'" },
+{ id:44, es:"Desayuno cereales.",             fr:"Je mange des céréales au petit-déjeuner.",ph:"ʒə mɑ̃ʒ de seʁeal o pəti deʒøne", cat:"tiempo",  danger:"articulo: DES céréales (artículo partitivo, sin equivalente exacto en español)" },
+{ id:45, es:"Me voy al insti en autobús.",    fr:"Je vais au collège en bus.",              ph:"ʒə vɛ o kɔlɛʒ ɑ̃ bys",         cat:"lugar",       danger:"preposicion: en bus (transporte) / au collège (lugar con 'à+le')" },
+{ id:46, es:"Vuelvo a casa a las cuatro.",    fr:"Je rentre à la maison à quatre heures.",  ph:"ʒə ʁɑ̃tʁ a la mɛzɔ̃ a katʁ œʁ", cat:"tiempo",    danger:null },
+{ id:47, es:"Ceno con mi familia.",           fr:"Je dîne avec ma famille.",                ph:"ʒə din avɛk ma famij",          cat:"tiempo",      danger:"pronunciacion: famille → 'famij', las l+l suenan como y" },
+{ id:48, es:"Me acuesto a las diez.",        fr:"Je me couche à dix heures.",              ph:"ʒə mə kuʃ a dizœʁ",            cat:"tiempo",      danger:"liaison: dix HEURES → la x suena z: 'dizœʁ'" },
+{ id:49, es:"Los fines de semana salgo.",    fr:"Le week-end, je sors.",                   ph:"lə wikɛnd, ʒə sɔʁ",            cat:"tiempo",      danger:null },
+{ id:50, es:"Escucho música en mi cuarto.",  fr:"J'écoute de la musique dans ma chambre.", ph:"ʒekut də la myzik dɑ̃ ma ʃɑ̃bʁ", cat:"lugar",     danger:"preposicion: DANS ma chambre (dentro de); EN francés es para lugares o meses" },
+
+// ── DESCRIPCIONES ────────────────────────────────────────
+{ id:51, es:"Soy alta y morena.",            fr:"Je suis grande et brune.",                ph:"ʒə sɥi gʁɑ̃d e bʁyn",          cat:"descripcion", danger:null },
+{ id:52, es:"Mi pelo es liso y largo.",      fr:"J'ai les cheveux lisses et longs.",       ph:"ʒe le ʃvo lis e lɔ̃",           cat:"descripcion", danger:"pronunciacion: cheveux → 'ʃvo', la -eux suena 'o'" },
+{ id:53, es:"Llevo gafas.",                  fr:"Je porte des lunettes.",                  ph:"ʒə pɔʁt de lynɛt",             cat:"descripcion", danger:null },
+{ id:54, es:"Mi mejor amigo es muy gracioso.",fr:"Mon meilleur ami est très marrant.",     ph:"mɔ̃ mɛjœʁ ami ɛ tʁɛ maʁɑ̃",    cat:"descripcion", danger:null },
+{ id:55, es:"Ella es muy sensible.",         fr:"Elle est très sensible.",                 ph:"ɛl ɛ tʁɛ sɑ̃sibl",             cat:"descripcion", danger:"falso amigo: sensible en francés = sensible en español ✔️ (aquí sí coincide)" },
+{ id:56, es:"Es un poco tímida.",           fr:"Elle est un peu timide.",                 ph:"ɛl ɛ œ̃ pø timid",             cat:"descripcion", danger:null },
+{ id:57, es:"Estoy de mal humor.",          fr:"Je suis de mauvaise humeur.",             ph:"ʒə sɥi də movɛz ymœʁ",         cat:"descripcion", danger:"genero: mauvaISE (forma femenina de mauvais)" },
+{ id:58, es:"Estoy de buen humor.",         fr:"Je suis de bonne humeur.",                ph:"ʒə sɥi də bɔn ymœʁ",           cat:"descripcion", danger:null },
+
+// ── PASADO (PASSÉ COMPOSÉ) ───────────────────────────────
+{ id:59, es:"Fui al cine ayer.",            fr:"Je suis allée au cinéma hier.",           ph:"ʒə sɥi ale o sinema jɛʁ",      cat:"pasado",      danger:"pasado: 'ir' usa être → JE SUIS allÉE (con concordancia: -e femenino)" },
+{ id:60, es:"Vi una película increíble.",  fr:"J'ai vu un film incroyable.",             ph:"ʒe vy œ̃ film ɛ̃kʁwajabl",      cat:"pasado",      danger:"pasado: voir usa avoir → J'AI vu" },
+{ id:61, es:"Comí una pizza.",             fr:"J'ai mangé une pizza.",                   ph:"ʒe mɑ̃ʒe yn pidza",             cat:"pasado",      danger:null },
+{ id:62, es:"Llegué tarde a clase.",       fr:"Je suis arrivée en retard en cours.",     ph:"ʒə sɥi aʁive ɑ̃ ʁətaʁ ɑ̃ kuʁ", cat:"pasado",      danger:"pasado: arriver usa être → JE SUIS arrivÉE" },
+{ id:63, es:"Hablé con mi madre.",         fr:"J'ai parlé avec ma mère.",                ph:"ʒe paʁle avɛk ma mɛʁ",          cat:"pasado",      danger:null },
+{ id:64, es:"No fui a la fiesta.",         fr:"Je ne suis pas allée à la fête.",         ph:"ʒə nə sɥi pa ale a la fɛt",    cat:"pasado",      danger:"negacion: ne...pas rodea a SUIS: je ne SUIS PAS allée" },
+{ id:65, es:"Me caí en el recreo. 😬",    fr:"Je suis tombée pendant la récré.",        ph:"ʒə sɥi tɔ̃be pɑ̃dɑ̃ la ʁekʁe",   cat:"pasado",      danger:"pasado: tomber usa être → JE SUIS tombÉE" },
+{ id:66, es:"¿Qué hiciste el finde?",      fr:"Qu'est-ce que tu as fait ce week-end ?",  ph:"kɛs kə ty a fɛ sə wikɛnd",     cat:"pasado",      danger:null },
+
+// ── PLANES Y FUTURO ──────────────────────────────────────
+{ id:67, es:"Este verano voy a Francia.",  fr:"Cet été, je vais en France.",             ph:"sɛt ete ʒə vɛ ɑ̃ fʁɑ̃s",        cat:"tiempo",      danger:"preposicion: EN France (países femeninos); AU Japon (países masculinos)" },
+{ id:68, es:"Voy a estudiar medicina.",    fr:"Je vais étudier la médecine.",            ph:"ʒə vɛ etydje la medsin",        cat:"tiempo",      danger:null },
+{ id:69, es:"Quiero aprender a conducir.", fr:"Je veux apprendre à conduire.",           ph:"ʒə vø apʁɑ̃dʁ a kɔ̃dɥiʁ",      cat:"modal",       danger:"preposicion: apprendre À + infinitivo" },
+{ id:70, es:"Algún día visitaré París.",  fr:"Un jour, je visiterai Paris.",            ph:"œ̃ ʒuʁ, ʒə vizitʁe paʁi",       cat:"tiempo",      danger:"pronunciacion: Paris → la -s final no se pronuncia: 'paʁi'" },
+{ id:71, es:"¿Qué vas a hacer mañana?",  fr:"Qu'est-ce que tu vas faire demain ?",     ph:"kɛs kə ty va fɛʁ dəmɛ̃",        cat:"tiempo",      danger:null },
+{ id:72, es:"Espero sacar buenas notas.",fr:"J'espère avoir de bonnes notes.",          ph:"ʒɛspɛʁ avwaʁ də bɔn nɔt",      cat:"tiempo",      danger:null },
+
+// ── SOCIAL / CONVERSACIÓN ────────────────────────────────
+{ id:73, es:"¿Quieres venir a mi casa?",  fr:"Tu veux venir chez moi ?",                ph:"ty vø vəniʁ ʃe mwa",            cat:"social",      danger:"preposicion: CHEZ moi (en casa de alguien); no 'à ma maison'" },
+{ id:74, es:"Lo siento mucho.",           fr:"Je suis vraiment désolée.",               ph:"ʒə sɥi vʁɛmɑ̃ dezɔle",          cat:"social",      danger:"genero: désoléE (femenino)" },
+{ id:75, es:"¡Feliz cumpleaños!",         fr:"Joyeux anniversaire !",                   ph:"ʒwajø anivɛʁsɛʁ",              cat:"social",      danger:null },
+{ id:76, es:"¿Puedo ayudarte?",          fr:"Je peux t'aider ?",                       ph:"ʒə pø tɛde",                    cat:"social",      danger:"pronombre: TE (te) → T' delante de vocal" },
+{ id:77, es:"¡Tienes suerte!",           fr:"T'as de la chance !",                     ph:"ta də la ʃɑ̃s",                  cat:"social",      danger:"registro: 'T'as' es muy coloquial (= Tu as). En clase o con adultos di: 'Tu as de la chance'" },
+{ id:78, es:"¡Qué mala suerte!",         fr:"Quelle poisse !",                         ph:"kɛl pwas",                      cat:"social",      danger:null },
+{ id:79, es:"¿Qué tal el fin de semana?",fr:"C'était bien le week-end ?",              ph:"setɛ bjɛ̃ lə wikɛnd",            cat:"social",      danger:null },
+{ id:80, es:"Te echo de menos.",         fr:"Tu me manques.",                          ph:"ty mə mɑ̃k",                     cat:"social",      danger:"falso amigo: en francés el sujeto es el que 'falta', no quien siente → TU me manques" },
+
+// ── NECESIDADES Y EMERGENCIAS ────────────────────────────
+{ id:81, es:"Tengo hambre.",             fr:"J'ai faim.",                              ph:"ʒe fɛ̃",                         cat:"basico",      danger:"pronunciacion: faim → 'fɛ̃', suena a 'fin' con vocal nasal" },
+{ id:82, es:"Tengo sed.",               fr:"J'ai soif.",                              ph:"ʒe swaf",                        cat:"basico",      danger:null },
+{ id:83, es:"Estoy nerviosa.",              fr:"Je suis stressée.",                      ph:"ʒə sɥi stʁese",                cat:"basico",      danger:"genero: stresséE (femenino; en francés 'nerveuse' existe pero 'stressée' es más común hoy)" },
+{ id:84, es:"Tengo frío.",              fr:"J'ai froid.",                             ph:"ʒe fʁwa",                        cat:"basico",      danger:null },
+{ id:85, es:"Tengo calor.",             fr:"J'ai chaud.",                             ph:"ʒe ʃo",                          cat:"basico",      danger:null },
+{ id:86, es:"Me duele la cabeza.",      fr:"J'ai mal à la tête.",                     ph:"ʒe mal a la tɛt",               cat:"basico",      danger:"preposicion: mal À la tête (no 'en')" },
+{ id:87, es:"Necesito ayuda.",          fr:"J'ai besoin d'aide.",                     ph:"ʒe bəzwɛ̃ dɛd",                 cat:"basico",      danger:null },
+{ id:88, es:"¡Llama a un médico!",      fr:"Appelle un médecin !",                   ph:"apɛl œ̃ medəsɛ̃",               cat:"basico",      danger:null },
+
+// ── TRANSPORTES Y DIRECCIONES ────────────────────────────
+{ id:89, es:"¿Dónde está la estación?", fr:"Où est la gare ?",                       ph:"u ɛ la gaʁ",                    cat:"lugar",       danger:null },
+{ id:90, es:"Quiero un billete a París.",fr:"Je voudrais un billet pour Paris.",      ph:"ʒə vudʁɛ œ̃ bijɛ pour paʁi",   cat:"lugar",       danger:null },
+{ id:91, es:"Gira a la derecha.",       fr:"Tourne à droite.",                       ph:"tuʁn a dʁwat",                  cat:"lugar",       danger:null },
+{ id:92, es:"Sigue todo recto.",        fr:"Continue tout droit.",                   ph:"kɔ̃tinɥ tu dʁwa",                cat:"lugar",       danger:null },
+{ id:93, es:"Está lejos de aquí.",      fr:"C'est loin d'ici.",                      ph:"sɛ lwɛ̃ disi",                   cat:"lugar",       danger:null },
+{ id:94, es:"Voy en tren.",             fr:"Je prends le train.",                    ph:"ʒə pʁɑ̃ lə tʁɛ̃",                cat:"lugar",       danger:null },
+
+// ── TIEMPO ATMOSFÉRICO ───────────────────────────────────
+{ id:95, es:"Hace buen tiempo.",            fr:"Il fait beau.",                          ph:"il fɛ bo",                       cat:"tiempo",      danger:"falso amigo: 'il fait beau' = hace buen tiempo (no exactamente 'hay sol'); para sol: 'il y a du soleil'" },
+{ id:96, es:"Está lloviendo.",          fr:"Il pleut.",                              ph:"il plø",                         cat:"tiempo",      danger:null },
+{ id:97, es:"Hace mucho frío hoy.",     fr:"Il fait très froid aujourd'hui.",        ph:"il fɛ tʁɛ fʁwa oʒuʁdɥi",        cat:"tiempo",      danger:"pronunciacion: aujourd'hui → 'oʒuʁdɥi', literalmente 'al día de hoy'" },
+{ id:98, es:"¿Qué tiempo hace?",        fr:"Quel temps fait-il ?",                   ph:"kɛl tɑ̃ fɛtil",                  cat:"tiempo",      danger:"pronunciacion: temps → 'tɑ̃', la -ps es muda" },
+
+// ── FALSOS AMIGOS (sección especial) ────────────────────
+{ id:99,  es:"En realidad, no lo sé.",       fr:"En fait, je ne sais pas.",              ph:"ɑ̃ fɛ ʒə nə sɛ pa",            cat:"social",      danger:"falso amigo: 'en fait' = en realidad (¡no 'de hecho' ni 'en el hecho'!)" },
+{ id:100, es:"Actualmente vivo en Sevilla.", fr:"Actuellement, j'habite à Séville.",     ph:"aktɥɛlmɑ̃ ʒabit a sevij",       cat:"social",      danger:"falso amigo: 'actuellement' = actualmente ✔️ (coincide con español, ¡bien!)" },
+{ id:101, es:"Asistí a la conferencia.",     fr:"J'ai assisté à la conférence.",         ph:"ʒe asiste a la kɔ̃feʁɑ̃s",       cat:"pasado",      danger:"falso amigo: 'assister à' = asistir a ✔️ Pero en inglés sería distinto" },
+{ id:102, es:"El colegio es un lugar.",      fr:"Le collège est un endroit.",            ph:"lə kɔlɛʒ ɛt œ̃ ɑ̃dʁwa",          cat:"basico",      danger:"falso amigo: 'collège' ≠ colegio universitario; es el instituto de secundaria" },
+{ id:103, es:"Estoy constipada.",            fr:"Je suis enrhumée.",                     ph:"ʒə sɥi ɑ̃ʁyme",                 cat:"social",      danger:"falso amigo: 'constipé' en francés = estreñida 😱 Para resfriado → enrhumée" },
+
+// ── PRONOMBRES Y ESTRUCTURAS COMPLEJAS ──────────────────
+{ id:104, es:"Se lo doy a ella.",            fr:"Je le lui donne.",                      ph:"ʒə lə lɥi dɔn",                cat:"pronombre",   danger:"pronombre: orden fijo: le (lo) + lui (a ella) + verbo. Sin preposición visible" },
+{ id:105, es:"Dámelo.",                      fr:"Donne-le-moi.",                         ph:"dɔn lə mwa",                   cat:"pronombre",   danger:"pronombre: en imperativo afirmativo el pronombre va DESPUÉS con guión" },
+{ id:106, es:"¿Me lo puedes explicar?",      fr:"Tu peux me l'expliquer ?",              ph:"ty pø mə lɛksplike",            cat:"pronombre",   danger:"pronombre: me l' (elision ante vocal) antes del verbo" },
+
+// ── ARTÍCULOS PARTITIVOS ─────────────────────────────────
+{ id:107, es:"Como pan con mantequilla.",    fr:"Je mange du pain avec du beurre.",      ph:"ʒə mɑ̃ʒ dy pɛ̃ avɛk dy bœʁ",   cat:"articulo",    danger:"articulo: DU pain (de + le = du). No existe igual en español: 'algo de pan'" },
+{ id:108, es:"Bebo leche por las mañanas.",  fr:"Je bois du lait le matin.",             ph:"ʒə bwa dy lɛ lə matɛ̃",         cat:"articulo",    danger:"articulo: DU lait (partitivo masculino)" },
+{ id:109, es:"Quiero agua, por favor.",      fr:"Je voudrais de l'eau, s'il vous plaît.",ph:"ʒə vudʁɛ də lo sil vu plɛ",    cat:"articulo",    danger:"articulo: DE L'eau (elision ante vocal: de + l')" },
+{ id:110, es:"Como verdura todos los días.", fr:"Je mange des légumes tous les jours.",  ph:"ʒə mɑ̃ʒ de legym tu le ʒuʁ",   cat:"articulo",    danger:"articulo: DES légumes (partitivo plural)" },
+
+// ── REDES SOCIALES Y TECNOLOGÍA ─────────────────────────
+{ id:111, es:"¿Tienes Instagram?",          fr:"T'as Insta ?",                           ph:"ta ɛ̃sta",                      cat:"social",      danger:null },
+{ id:112, es:"Te mando un mensaje.",        fr:"Je t'envoie un message.",                ph:"ʒə tɑ̃vwa œ̃ mesaʒ",            cat:"social",      danger:null },
+{ id:113, es:"Acabo de subir una foto.",    fr:"Je viens de poster une photo.",          ph:"ʒə vjɛ̃ də pɔste yn foto",       cat:"pasado",      danger:null },
+{ id:114, es:"Mi móvil está sin batería.",  fr:"Mon portable est à plat.",               ph:"mɔ̃ pɔʁtabl ɛ a pla",           cat:"social",      danger:null },
+{ id:115, es:"¿Cuál es tu contraseña del wifi?", fr:"C'est quoi ton code wifi ?",        ph:"sɛ kwa tɔ̃ kɔd wifi",           cat:"social",      danger:null },
+
+// ── EXCLAMACIONES Y EXPRESIONES ─────────────────────────
+{ id:116, es:"¡Eso es mentira!",            fr:"C'est faux !",                           ph:"sɛ fo",                         cat:"social",      danger:null },
+{ id:117, es:"¡Increíble!",                 fr:"C'est dingue !",                         ph:"sɛ dɛ̃g",                        cat:"social",      danger:null },
+{ id:118, es:"¡Genial!",                    fr:"Super !",                                ph:"sypɛʁ",                         cat:"social",      danger:"pronunciacion: super → se pronuncia completo 'sypɛʁ', no como en inglés" },
+{ id:119, es:"¡Qué vergüenza!",             fr:"La honte !",                             ph:"la ɔ̃t",                         cat:"social",      danger:null },
+{ id:120, es:"¡Vamos!",                     fr:"Allez !",                                ph:"ale",                           cat:"social",      danger:"pronunciacion: allez → 'ale', la -z final no suena" },
+];
+
+const CAT_LABELS = {
+    basico:      { emoji:'🔤', label:'Esencial',    cls:'cat-info' },
+    saludo:      { emoji:'👋', label:'Saludos',     cls:'cat-ok' },
+    social:      { emoji:'💬', label:'Social',      cls:'cat-info' },
+    tiempo:      { emoji:'⏰', label:'Tiempo',      cls:'cat-info' },
+    lugar:       { emoji:'📍', label:'Lugar',       cls:'cat-info' },
+    descripcion: { emoji:'🎨', label:'Descripción', cls:'cat-info' },
+    modal:       { emoji:'🎯', label:'Modales',     cls:'cat-ok' },
+    pasado:      { emoji:'⏮️', label:'Pasado',      cls:'cat-warn' },
+    negacion:    { emoji:'🚫', label:'Negación',    cls:'cat-warn' },
+    pronombre:   { emoji:'🔀', label:'Pronombres',  cls:'cat-warn' },
+    articulo:    { emoji:'📝', label:'Artículos',   cls:'cat-warn' },
+    formal:      { emoji:'🎩', label:'Formal',      cls:'cat-ok' },
+};
+
+const TOTAL = rawData.length;
+
+let state = {
+    mode: 'card',
+    currentIndex: 0,
+    showAnswer: false,
+    isShuffled: false,
+    order: [...Array(TOTAL).keys()]
+};
+
+function setMode(m) {
+    state.mode = m;
+    const card = document.getElementById('view-card');
+    const list = document.getElementById('view-list');
+    if (m === 'card') { card.style.display = 'flex'; list.classList.remove('visible'); }
+    else              { card.style.display = 'none';  list.classList.add('visible'); renderList(); }
+    document.getElementById('btn-mode-card').classList.toggle('active', m === 'card');
+    document.getElementById('btn-mode-list').classList.toggle('active', m === 'list');
+}
+
+function toggleShuffle() {
+    state.currentIndex = 0; state.showAnswer = false;
+    if (state.isShuffled) state.order = [...Array(TOTAL).keys()];
+    else state.order = [...state.order].sort(() => Math.random() - 0.5);
+    state.isShuffled = !state.isShuffled;
+    document.getElementById('btn-shuffle').classList.toggle('on', state.isShuffled);
+    renderCard();
+}
+
+function renderCard() {
+    const d = rawData[state.order[state.currentIndex]];
+    document.getElementById('text-es').textContent = d.es;
+    document.getElementById('text-fr').textContent = d.fr;
+    document.getElementById('text-phonetic').textContent = d.ph ? `[ ${d.ph} ]` : '';
+
+    // Category pill
+    const catInfo = CAT_LABELS[d.cat] || CAT_LABELS['basico'];
+    const pill = document.getElementById('cat-pill');
+    pill.textContent = `${catInfo.emoji} ${catInfo.label}`;
+    pill.className = `category-pill ${catInfo.cls}`;
+
+    // Danger zone
+    const dangerDiv = document.getElementById('danger-zone');
+    const dangerText = document.getElementById('danger-text');
+    if (d.danger) {
+        dangerDiv.style.display = 'block';
+        dangerText.textContent = `⚠️ ${d.danger}`;
+    } else {
+        dangerDiv.style.display = 'none';
+    }
+
+    // Progress
+    const pct = ((state.currentIndex + 1) / TOTAL * 100).toFixed(1);
+    document.getElementById('progress-bar').style.width = `${pct}%`;
+    document.getElementById('progress-text').textContent = `Frase ${state.currentIndex + 1} de ${TOTAL}`;
+    document.getElementById('shuffle-indicator').textContent = state.isShuffled ? '🔀 Aleatorio' : '📋 Secuencial';
+    document.getElementById('btn-prev').disabled = state.currentIndex === 0;
+    document.getElementById('btn-next').disabled = state.currentIndex === TOTAL - 1;
+
+    state.showAnswer = false;
+    updateAnswerUI();
+}
+
+function updateAnswerUI() {
+    const s = document.getElementById('answer-section');
+    const h = document.getElementById('tap-hint');
+    if (state.showAnswer) {
+        s.classList.remove('hidden-answer');
+        h.style.display = 'none';
+    } else {
+        s.classList.add('hidden-answer');
+        h.style.display = 'block';
+    }
+}
+
+function toggleAnswer() {
+    state.showAnswer = !state.showAnswer;
+    updateAnswerUI();
+}
+
+function nextCard() { if (state.currentIndex < TOTAL - 1) { state.currentIndex++; renderCard(); } }
+function prevCard() { if (state.currentIndex > 0)         { state.currentIndex--; renderCard(); } }
+function resetApp() { state.currentIndex = 0; if (state.isShuffled) { state.isShuffled = false; state.order = [...Array(TOTAL).keys()]; document.getElementById('btn-shuffle').classList.remove('on'); } renderCard(); }
+
+function speakFrench(text) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'fr-FR';
+    u.rate = 0.85;
+    window.speechSynthesis.speak(u);
+}
+function speakCurrent() {
+    speakFrench(rawData[state.order[state.currentIndex]].fr);
+}
+
+function renderList() {
+    const q = (document.getElementById('search-input').value || '').toLowerCase();
+    const filtered = rawData.filter(i =>
+        i.es.toLowerCase().includes(q) ||
+        i.fr.toLowerCase().includes(q) ||
+        (i.danger && i.danger.toLowerCase().includes(q))
+    );
+    document.getElementById('list-body').innerHTML = filtered.map(i => {
+        const hasDanger = i.danger ? `<span class="list-danger">⚠️ zona peligrosa</span>` : '';
+        return `
+        <div class="list-item" onclick="speakFrench('${i.fr.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
+            <span class="list-num">${i.id}</span>
+            <div style="flex:1;min-width:0">
+                <div class="list-es">${i.es}${hasDanger}</div>
+                <div class="list-fr">🇫🇷 ${i.fr}</div>
+                ${i.ph ? `<div class="list-phonetic">[ ${i.ph} ]</div>` : ''}
+                ${i.danger ? `<div style="font-size:0.6rem;color:#F59300;margin-top:3px">⚠️ ${i.danger}</div>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// Swipe support
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive:true});
+document.addEventListener('touchend', e => {
+    if (state.mode !== 'card') return;
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(dx) > 60) { if (dx < 0) nextCard(); else prevCard(); }
+}, {passive:true});
+
+window.onload = () => { renderCard(); renderList(); };
+</script>
+</body>
+</html>
